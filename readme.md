@@ -7,7 +7,7 @@
     - [x] Knight Moves
     - [x] King Moves
     - [ ] Castling
-    - [ ] Bishop Moves
+    - [x] Bishop Moves
     - [ ] Rook Moves
     - [ ] Queen Moves
     - [ ] Check, if king is in check after a move
