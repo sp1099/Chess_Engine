@@ -52,7 +52,7 @@ class Game():
 
 
         # DEBUG
-        self.piece_bitboards["white_bishop"] = set_bitboard_bit(35, self.piece_bitboards["white_bishop"])
+        self.piece_bitboards["white_rook"] = set_bitboard_bit(35, self.piece_bitboards["white_rook"])
 
 
     def pretty_print_board(self):
@@ -247,7 +247,52 @@ class Game():
 
 
     def generate_rook_moves(self):
-        return []
+        rook_moves = []
+
+        for rook_square in range(64):
+            rook_moves.extend(self.generate_single_rook_moves(rook_square))
+
+        return rook_moves
+
+    def generate_single_rook_moves(self, rook_square):
+        rook_moves = []
+        occupancy_white = np.uint64(0)
+        occupancy_black = np.uint64(0)
+
+        for piece_type, bitboard in self.piece_bitboards.items():
+            if "white" in piece_type:
+                occupancy_white = np.bitwise_or(occupancy_white, bitboard)
+            else:
+                occupancy_black = np.bitwise_or(occupancy_black, bitboard)
+
+        occupancy = np.bitwise_or(occupancy_white, occupancy_black)
+
+        occupancy = np.bitwise_and(occupancy, ROOK_MASKS[rook_square])
+        occupancy = occupancy * ROOK_MAGIC_NUMBERS[rook_square]
+        occupancy = occupancy >> np.uint8(64 - ROOK_MAGIC_SHIFTS[rook_square])
+
+        move_bitboard = ROOK_MOVES[rook_square][occupancy]
+        # if bishop_square == 35:
+        #     print("OCCUPANCY: ", occupancy)
+        #     print_bitboard(move_bitboard)
+        #self.print_bitboard(move_bitboard)
+
+        if self.color == COLOR_WHITE:
+            if np.bitwise_and(self.piece_bitboards["white_rook"], (np.uint64(1) << np.uint8(rook_square))):
+                move_bitboard = np.bitwise_and(move_bitboard, np.bitwise_not(occupancy_white))
+
+                for move_square in range(64):
+                    if np.bitwise_and(move_bitboard, (np.uint64(1) << np.uint8(move_square))):
+                        rook_moves.append(Move(start_square=rook_square, end_square=move_square, move_type="WHITE ROOK MOVE"))
+        else:
+            if np.bitwise_and(self.piece_bitboards["black_rook"], (np.uint64(1) << np.uint8(rook_square))):
+                move_bitboard = np.bitwise_and(move_bitboard, np.bitwise_not(occupancy_black))
+
+                for move_square in range(64):
+                    if np.bitwise_and(move_bitboard, (np.uint64(1) << np.uint8(move_square))):
+                        rook_moves.append(Move(start_square=rook_square, end_square=move_square, move_type="BLACK ROOK MOVE"))
+
+        return rook_moves
 
 
     def generate_bishop_moves(self):
