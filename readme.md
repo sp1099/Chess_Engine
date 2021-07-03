@@ -8,8 +8,8 @@
     - [x] King Moves
     - [ ] Castling
     - [x] Bishop Moves
-    - [ ] Rook Moves
-    - [ ] Queen Moves
+    - [x] Rook Moves
+    - [x] Queen Moves
     - [ ] Check, if king is in check after a move
 - [ ] make_move Function
     - [x] Reset Start Square
