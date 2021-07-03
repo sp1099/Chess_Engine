@@ -52,7 +52,7 @@ class Game():
 
 
         # DEBUG
-        self.piece_bitboards["white_rook"] = set_bitboard_bit(35, self.piece_bitboards["white_rook"])
+        self.piece_bitboards["white_queen"] = set_bitboard_bit(35, self.piece_bitboards["white_queen"])
 
 
     def pretty_print_board(self):
@@ -272,10 +272,6 @@ class Game():
         occupancy = occupancy >> np.uint8(64 - ROOK_MAGIC_SHIFTS[rook_square])
 
         move_bitboard = ROOK_MOVES[rook_square][occupancy]
-        # if bishop_square == 35:
-        #     print("OCCUPANCY: ", occupancy)
-        #     print_bitboard(move_bitboard)
-        #self.print_bitboard(move_bitboard)
 
         if self.color == COLOR_WHITE:
             if np.bitwise_and(self.piece_bitboards["white_rook"], (np.uint64(1) << np.uint8(rook_square))):
@@ -321,10 +317,6 @@ class Game():
         occupancy = occupancy >> np.uint8(64 - BISHOP_MAGIC_SHIFTS[bishop_square])
 
         move_bitboard = BISHOP_MOVES[bishop_square][occupancy]
-        # if bishop_square == 35:
-        #     print("OCCUPANCY: ", occupancy)
-        #     print_bitboard(move_bitboard)
-        #self.print_bitboard(move_bitboard)
 
         if self.color == COLOR_WHITE:
             if np.bitwise_and(self.piece_bitboards["white_bishop"], (np.uint64(1) << np.uint8(bishop_square))):
@@ -345,7 +337,55 @@ class Game():
 
 
     def generate_queen_moves(self):
-        return []
+        queen_moves = []
+
+        for queen_square in range(64):
+            queen_moves.extend(self.generate_single_queen_moves(queen_square))
+
+        return queen_moves
+
+    def generate_single_queen_moves(self, queen_square):
+        queen_moves = []
+        occupancy_white = np.uint64(0)
+        occupancy_black = np.uint64(0)
+
+        for piece_type, bitboard in self.piece_bitboards.items():
+            if "white" in piece_type:
+                occupancy_white = np.bitwise_or(occupancy_white, bitboard)
+            else:
+                occupancy_black = np.bitwise_or(occupancy_black, bitboard)
+
+        occupancy_bishop = np.bitwise_or(occupancy_white, occupancy_black)
+        occupancy_rook = np.bitwise_or(occupancy_white, occupancy_black)
+
+        occupancy_bishop = np.bitwise_and(occupancy_bishop, BISHOP_MASKS[queen_square])
+        occupancy_bishop = occupancy_bishop * BISHOP_MAGIC_NUMBERS[queen_square]
+        occupancy_bishop = occupancy_bishop >> np.uint8(64 - BISHOP_MAGIC_SHIFTS[queen_square])
+        move_bitboard_bishop = BISHOP_MOVES[queen_square][occupancy_bishop]
+
+        occupancy_rook = np.bitwise_and(occupancy_rook, ROOK_MASKS[queen_square])
+        occupancy_rook = occupancy_rook * ROOK_MAGIC_NUMBERS[queen_square]
+        occupancy_rook = occupancy_rook >> np.uint8(64 - ROOK_MAGIC_SHIFTS[queen_square])
+        move_bitboard_rook = ROOK_MOVES[queen_square][occupancy_rook]
+
+        move_bitboard = np.bitwise_or(move_bitboard_bishop, move_bitboard_rook)
+
+        if self.color == COLOR_WHITE:
+            if np.bitwise_and(self.piece_bitboards["white_queen"], (np.uint64(1) << np.uint8(queen_square))):
+                move_bitboard = np.bitwise_and(move_bitboard, np.bitwise_not(occupancy_white))
+
+                for move_square in range(64):
+                    if np.bitwise_and(move_bitboard, (np.uint64(1) << np.uint8(move_square))):
+                        queen_moves.append(Move(start_square=queen_square, end_square=move_square, move_type="WHITE QUEEN MOVE"))
+        else:
+            if np.bitwise_and(self.piece_bitboards["black_queen"], (np.uint64(1) << np.uint8(queen_square))):
+                move_bitboard = np.bitwise_and(move_bitboard, np.bitwise_not(occupancy_black))
+
+                for move_square in range(64):
+                    if np.bitwise_and(move_bitboard, (np.uint64(1) << np.uint8(move_square))):
+                        queen_moves.append(Move(start_square=queen_square, end_square=move_square, move_type="BLACK QUEEN MOVE"))
+
+        return queen_moves
 
     def check_pseudo_move(self, move):
         return True
