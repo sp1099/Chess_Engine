@@ -16,7 +16,7 @@ def main():
     y_old = -1
     while True:
         gui.game_display.fill((255, 255, 255))
-        piece, x, y = gui.get_square_under_mouse()
+        piece, x, y = gui.draw_drag(selected_piece, x_old, y_old)
         # print(piece)
         for event in pygame.event.get():
             # print(event)
@@ -87,11 +87,11 @@ class GUI(pygame.sprite.Sprite):
 
     def get_square_under_mouse(self):
         x, y = pygame.Vector2(pygame.mouse.get_pos())
-        x = int((x-self.board_draw_x) / self.piece_length)
-        y = 7-int((y-self.board_draw_y) / self.piece_length)
-
+        x = (x-self.board_draw_x) / self.piece_length
+        y = 8-(y-self.board_draw_y) / self.piece_length
         if x >= 0 and y >= 0 and x <= 7 and y <= 7:
-            # print(x, y)
+            x = int(x)
+            y = int(y)
             return (self.current_board[x+8*y], x, y)
 
         return None, None, None
@@ -135,6 +135,30 @@ class GUI(pygame.sprite.Sprite):
                         self.pieces[key].image, (self.pieces[key].x, self.pieces[key].y))
 
                 # print()
+
+    def draw_drag(self, selected_piece, old_x, old_y, font=False):
+        piece, x, y = self.get_square_under_mouse()
+        if selected_piece:
+
+            if x != None:
+                rect = (x * self.piece_length,
+                        (7-y) * self.piece_length, self.piece_length, self.piece_length)
+                pygame.draw.rect(self.board, (0, 255, 0, 50), rect, 2)
+
+            # color, type = selected_piece[0]
+            # s1 = font.render(type[0], True, pygame.Color(color))
+            # s2 = font.render(type[0], True, pygame.Color('darkgrey'))
+
+                old_rect = (old_x * self.piece_length,
+                            (7-old_y) * self.piece_length, self.piece_length, self.piece_length)
+                pygame.draw.rect(
+                    self.board, (255, 0, 0, 50), old_rect, 2)
+
+                pygame.draw.line(self.board, pygame.Color(
+                    'red'), (old_x * self.piece_length + self.piece_length/2,
+                             (7-old_y) * self.piece_length + self.piece_length/2), (x * self.piece_length + self.piece_length/2,
+                                                                                    (7-y) * self.piece_length + self.piece_length/2))
+        return piece, x, y
 
     def load_pieces(self):
         # piece images from: https://commons.wikimedia.org/wiki/Category:SVG_chess_pieces/Standard
