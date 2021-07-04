@@ -51,8 +51,7 @@ def main():
 
                         gui.game.piece_bitboards[selected_piece] = set_bitboard_bit(
                             x+y*8, gui.game.piece_bitboards[selected_piece])
-                        # print_bitboard(
-                        #    gui.game.piece_bitboards[selected_piece])
+
                         print("Moved")
                     print("X_new: " + str(x) + " Y_new: " + str(y))
                 selected_piece = None
@@ -89,7 +88,7 @@ class GUI(pygame.sprite.Sprite):
         x, y = pygame.Vector2(pygame.mouse.get_pos())
         x = (x-self.board_draw_x) / self.piece_length
         y = 8-(y-self.board_draw_y) / self.piece_length
-        if x >= 0 and y >= 0 and x <= 7 and y <= 7:
+        if x >= 0 and y >= 0 and x < 8 and y < 8:
             x = int(x)
             y = int(y)
             return (self.current_board[x+8*y], x, y)
