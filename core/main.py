@@ -3,7 +3,7 @@
 import pygame
 import os
 import numpy as np
-from utils.bitboard_operations import get_bitboard_bit
+from utils.bitboard_operations import unset_bitboard_bit, set_bitboard_bit, get_bitboard_bit, print_bitboard
 from game import Game
 
 
@@ -11,16 +11,56 @@ def main():
     pygame.init()
     gui = GUI(800, 600)
     gui.load_pieces()
+    selected_piece = None
+    x_old = -1
+    y_old = -1
     while True:
         gui.game_display.fill((255, 255, 255))
+        piece, x, y = gui.get_square_under_mouse()
+        # print(piece)
         for event in pygame.event.get():
             # print(event)
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
 
-        gui.draw_board(gui.game.piece_bitboards)
-        pygame.display.update()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if piece != None:
+                    selected_piece, x_old, y_old = piece, x, y
+                    print("X_old: " + str(x) + " Y_old:" + str(y))
+                    # print(str(piece))
+            if event.type == pygame.MOUSEBUTTONUP:
+                if piece != None:
+                    print("Selected: " + selected_piece)
+                    if piece == "":
+                        print("Move to: " + "empty_field at: x=" +
+                              str(x) + " y=" + str(y))
+                    else:
+                        print("Move to: " + piece + " at: x=" +
+                              str(x) + " y=" + str(y))
+                    # check if piece was not moved or empty field was selected
+                    if selected_piece == "" or (x == x_old) and (y == y_old):
+                        print("No Move")
+
+                    # check move for validity in engine
+                    # TODO: Send data here to engine and get new bitboards to draw
+                    else:
+                        # TODO: ENTFERNEN und durch ENGINE AKTUALISIERUNG ERSETZEN
+                        gui.game.piece_bitboards[selected_piece] = unset_bitboard_bit(
+                            x_old+8*y_old, gui.game.piece_bitboards[selected_piece])
+
+                        gui.game.piece_bitboards[selected_piece] = set_bitboard_bit(
+                            x+y*8, gui.game.piece_bitboards[selected_piece])
+                        # print_bitboard(
+                        #    gui.game.piece_bitboards[selected_piece])
+                        print("Moved")
+                    print("X_new: " + str(x) + " Y_new: " + str(y))
+                selected_piece = None
+                x_old = -1
+                y_old = -1
+
+        gui.draw_pieces(gui.game.piece_bitboards)
+        pygame.display.flip()
         gui.clock.tick(30)
 
 
@@ -41,7 +81,28 @@ class GUI(pygame.sprite.Sprite):
         self.game = Game()
         self.all_sprites = pygame.sprite.Group()
 
-        # TODO: Draw pieces
+        # list for keeping all fields logically
+        # a zero represents no unit on field
+        self.current_board = np.zeros(64, dtype='U15')
+
+    def get_square_under_mouse(self):
+        x, y = pygame.Vector2(pygame.mouse.get_pos())
+        x = int((x-self.board_draw_x) / self.piece_length)
+        y = 7-int((y-self.board_draw_y) / self.piece_length)
+
+        if x >= 0 and y >= 0 and x <= 7 and y <= 7:
+            # print(x, y)
+            return (self.current_board[x+8*y], x, y)
+
+        return None, None, None
+
+    def draw_pieces(self, bitboards):
+        # draw black and white fields
+        # self.game_display.fill((255, 255, 255))
+        self.game_display.blit(
+            self.board, (self.board_draw_x, self.board_draw_y))
+
+        # Draw board background
         for x in range(8):
             for y in range(8):
                 if (x+y) % 2 == 0:
@@ -54,11 +115,7 @@ class GUI(pygame.sprite.Sprite):
                     pygame.draw.rect(self.board, (194, 181, 180), (self.piece_length * x, self.piece_length *
                                      (7-y), self.piece_length, self.piece_length))
                     # draw board onto screen
-
-    def draw_board(self, bitboards):
-        # draw black and white fields
-        self.game_display.blit(
-            self.board, (self.board_draw_x, self.board_draw_y))
+        self.current_board = np.zeros(64, dtype='U15')
 
         for key, bitboard in bitboards.items():
             for i in range(64):
@@ -66,12 +123,17 @@ class GUI(pygame.sprite.Sprite):
                 y = 0
                 tmp_bitboard = get_bitboard_bit(i, bitboard)
                 # if key == "black_king":
-                #print(key + " :" + str(tmp_bitboard))
+                # print(key + " :" + str(tmp_bitboard))
                 if tmp_bitboard != 0:
                     y = int(i / 8)
                     x = int(i % 8)
+                    self.current_board[i] = key
+                    self.pieces[key].x = self.piece_length * x
+                    self.pieces[key].y = self.board_length - \
+                        ((y+1)*self.piece_length)
                     self.board.blit(
-                        self.pieces[key].image, (self.piece_length*x, self.board_length-((y+1)*self.piece_length)))
+                        self.pieces[key].image, (self.pieces[key].x, self.pieces[key].y))
+
                 # print()
 
     def load_pieces(self):
@@ -105,9 +167,10 @@ class GUI(pygame.sprite.Sprite):
 
 class piece_class(pygame.sprite.Sprite):
     def __init__(self, pos, image):
-
+        self.x, self.y = pos
         self.image = image
         self.rect = self.image.get_rect(topleft=pos)
+        self.msg = "HI"
 
 
 if __name__ == "__main__":
