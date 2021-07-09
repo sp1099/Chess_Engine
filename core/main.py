@@ -5,6 +5,7 @@ import os
 import numpy as np
 from utils.bitboard_operations import unset_bitboard_bit, set_bitboard_bit, get_bitboard_bit, print_bitboard
 from game import Game
+import move
 
 
 def main():
@@ -45,12 +46,15 @@ def main():
                     # check move for validity in engine
                     # TODO: Send data here to engine and get new bitboards to draw
                     else:
-                        # TODO: ENTFERNEN und durch ENGINE AKTUALISIERUNG ERSETZEN
-                        gui.game.piece_bitboards[selected_piece] = unset_bitboard_bit(
-                            x_old+8*y_old, gui.game.piece_bitboards[selected_piece])
+                        # create a move
+                        generated_move = move.Move(x_old+y_old*8, x+y*8)
+                        gui.game.make_move(generated_move)
+                        # # TODO: ENTFERNEN und durch ENGINE AKTUALISIERUNG ERSETZEN
+                        # gui.game.piece_bitboards[selected_piece] = unset_bitboard_bit(
+                        #     x_old+8*y_old, gui.game.piece_bitboards[selected_piece])
 
-                        gui.game.piece_bitboards[selected_piece] = set_bitboard_bit(
-                            x+y*8, gui.game.piece_bitboards[selected_piece])
+                        # gui.game.piece_bitboards[selected_piece] = set_bitboard_bit(
+                        #     x+y*8, gui.game.piece_bitboards[selected_piece])
 
                         print("Moved")
                     print("X_new: " + str(x) + " Y_new: " + str(y))
