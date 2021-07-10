@@ -4,6 +4,7 @@ from constants import *
 from move import Move
 from utils.bitboard_operations import *
 
+
 class Game():
 
     def __init__(self):
@@ -28,32 +29,49 @@ class Game():
         self.init_pieces()
 
     def init_pieces(self):
-        self.piece_bitboards["white_rook"] = set_bitboard_bit(0, self.piece_bitboards["white_rook"])
-        self.piece_bitboards["white_rook"] = set_bitboard_bit(7, self.piece_bitboards["white_rook"])
-        self.piece_bitboards["white_knight"] = set_bitboard_bit(1, self.piece_bitboards["white_knight"])
-        self.piece_bitboards["white_knight"] = set_bitboard_bit(6, self.piece_bitboards["white_knight"])
-        self.piece_bitboards["white_bishop"] = set_bitboard_bit(2, self.piece_bitboards["white_bishop"])
-        self.piece_bitboards["white_bishop"] = set_bitboard_bit(5, self.piece_bitboards["white_bishop"])
-        self.piece_bitboards["white_queen"] = set_bitboard_bit(3, self.piece_bitboards["white_queen"])
-        self.piece_bitboards["white_king"] = set_bitboard_bit(4, self.piece_bitboards["white_king"])
+        self.piece_bitboards["white_rook"] = set_bitboard_bit(
+            0, self.piece_bitboards["white_rook"])
+        self.piece_bitboards["white_rook"] = set_bitboard_bit(
+            7, self.piece_bitboards["white_rook"])
+        self.piece_bitboards["white_knight"] = set_bitboard_bit(
+            1, self.piece_bitboards["white_knight"])
+        self.piece_bitboards["white_knight"] = set_bitboard_bit(
+            6, self.piece_bitboards["white_knight"])
+        self.piece_bitboards["white_bishop"] = set_bitboard_bit(
+            2, self.piece_bitboards["white_bishop"])
+        self.piece_bitboards["white_bishop"] = set_bitboard_bit(
+            5, self.piece_bitboards["white_bishop"])
+        self.piece_bitboards["white_queen"] = set_bitboard_bit(
+            3, self.piece_bitboards["white_queen"])
+        self.piece_bitboards["white_king"] = set_bitboard_bit(
+            4, self.piece_bitboards["white_king"])
 
-        self.piece_bitboards["black_rook"] = set_bitboard_bit(63, self.piece_bitboards["black_rook"])
-        self.piece_bitboards["black_rook"] = set_bitboard_bit(56, self.piece_bitboards["black_rook"])
-        self.piece_bitboards["black_knight"] = set_bitboard_bit(62, self.piece_bitboards["black_knight"])
-        self.piece_bitboards["black_knight"] = set_bitboard_bit(57, self.piece_bitboards["black_knight"])
-        self.piece_bitboards["black_bishop"] = set_bitboard_bit(61, self.piece_bitboards["black_bishop"])
-        self.piece_bitboards["black_bishop"] = set_bitboard_bit(58, self.piece_bitboards["black_bishop"])
-        self.piece_bitboards["black_queen"] = set_bitboard_bit(59, self.piece_bitboards["black_queen"])
-        self.piece_bitboards["black_king"] = set_bitboard_bit(60, self.piece_bitboards["black_king"])
+        self.piece_bitboards["black_rook"] = set_bitboard_bit(
+            63, self.piece_bitboards["black_rook"])
+        self.piece_bitboards["black_rook"] = set_bitboard_bit(
+            56, self.piece_bitboards["black_rook"])
+        self.piece_bitboards["black_knight"] = set_bitboard_bit(
+            62, self.piece_bitboards["black_knight"])
+        self.piece_bitboards["black_knight"] = set_bitboard_bit(
+            57, self.piece_bitboards["black_knight"])
+        self.piece_bitboards["black_bishop"] = set_bitboard_bit(
+            61, self.piece_bitboards["black_bishop"])
+        self.piece_bitboards["black_bishop"] = set_bitboard_bit(
+            58, self.piece_bitboards["black_bishop"])
+        self.piece_bitboards["black_queen"] = set_bitboard_bit(
+            59, self.piece_bitboards["black_queen"])
+        self.piece_bitboards["black_king"] = set_bitboard_bit(
+            60, self.piece_bitboards["black_king"])
 
         for i in range(8, 16):
-            self.piece_bitboards["white_pawn"] = set_bitboard_bit(i, self.piece_bitboards["white_pawn"])
-            self.piece_bitboards["black_pawn"] = set_bitboard_bit(63 - i, self.piece_bitboards["black_pawn"])
-
+            self.piece_bitboards["white_pawn"] = set_bitboard_bit(
+                i, self.piece_bitboards["white_pawn"])
+            self.piece_bitboards["black_pawn"] = set_bitboard_bit(
+                63 - i, self.piece_bitboards["black_pawn"])
 
         # DEBUG
-        self.piece_bitboards["white_queen"] = set_bitboard_bit(35, self.piece_bitboards["white_queen"])
-
+        self.piece_bitboards["white_queen"] = set_bitboard_bit(
+            35, self.piece_bitboards["white_queen"])
 
     def pretty_print_board(self):
 
@@ -85,7 +103,6 @@ class Game():
 
         # self.print_bitboard(occupancy_board)
 
-
     def generate_moves(self):
         pseudo_legal_moves = []
 
@@ -95,7 +112,7 @@ class Game():
         pseudo_legal_moves.extend(self.generate_bishop_moves())
         pseudo_legal_moves.extend(self.generate_rook_moves())
         pseudo_legal_moves.extend(self.generate_queen_moves())
-            
+
         # Make pseudo legal moves and test for king checks
         legal_moves = []
         for move in pseudo_legal_moves:
@@ -119,22 +136,28 @@ class Game():
 
         if self.color == COLOR_WHITE:
             for pawn_square in range(64):
-                pawn_moves.extend(self.generate_white_pawn_moves(pawn_square, np.bitwise_or(occupancy_white, occupancy_black)))
-                pawn_attacks.extend(self.generate_white_pawn_attacks(pawn_square, occupancy_black))
+                pawn_moves.extend(self.generate_white_pawn_moves(
+                    pawn_square, np.bitwise_or(occupancy_white, occupancy_black)))
+                pawn_attacks.extend(self.generate_white_pawn_attacks(
+                    pawn_square, occupancy_black))
         else:
             for pawn_square in range(64):
-                pawn_moves.extend(self.generate_black_pawn_moves(pawn_square, np.bitwise_or(occupancy_white, occupancy_black)))
-                pawn_attacks.extend(self.generate_black_pawn_attacks(pawn_square, occupancy_white))
+                pawn_moves.extend(self.generate_black_pawn_moves(
+                    pawn_square, np.bitwise_or(occupancy_white, occupancy_black)))
+                pawn_attacks.extend(self.generate_black_pawn_attacks(
+                    pawn_square, occupancy_white))
 
         return (pawn_moves + pawn_attacks)
 
     def generate_white_pawn_moves(self, pawn_square, board_occupancy):
         pawn_moves = []
         if np.bitwise_and(self.piece_bitboards["white_pawn"], (np.uint64(1) << np.uint8(pawn_square))):
-            move_bitboard = np.bitwise_and(PAWN_MOVES_WHITE[pawn_square], np.bitwise_not(board_occupancy))
+            move_bitboard = np.bitwise_and(
+                PAWN_MOVES_WHITE[pawn_square], np.bitwise_not(board_occupancy))
             for move_square in range(64):
                 if np.bitwise_and(move_bitboard, (np.uint64(1) << np.uint8(move_square))):
-                    pawn_moves.append(Move(start_square=pawn_square, end_square=move_square, move_type="WHITE PAWN MOVE"))
+                    pawn_moves.append(Move(
+                        start_square=pawn_square, end_square=move_square, move_type="WHITE PAWN MOVE"))
 
         if len(pawn_moves) == 1:
             if abs(pawn_moves[0].start_square - pawn_moves[0].end_square) == 16:
@@ -145,20 +168,24 @@ class Game():
     def generate_white_pawn_attacks(self, pawn_square, occupancy_black):
         pawn_attacks = []
         if np.bitwise_and(self.piece_bitboards["white_pawn"], (np.uint64(1) << np.uint8(pawn_square))):
-            move_bitboard = np.bitwise_and(PAWN_ATTACKS_WHITE[pawn_square], occupancy_black)
+            move_bitboard = np.bitwise_and(
+                PAWN_ATTACKS_WHITE[pawn_square], occupancy_black)
             for move_square in range(64):
                 if np.bitwise_and(move_bitboard, (np.uint64(1) << np.uint8(move_square))):
-                    pawn_attacks.append(Move(start_square=pawn_square, end_square=move_square, move_type="WHITE PAWN ATTACK"))
+                    pawn_attacks.append(Move(
+                        start_square=pawn_square, end_square=move_square, move_type="WHITE PAWN ATTACK"))
 
         return pawn_attacks
 
     def generate_black_pawn_moves(self, pawn_square, board_occupancy):
         pawn_moves = []
         if np.bitwise_and(self.piece_bitboards["black_pawn"], (np.uint64(1) << np.uint8(pawn_square))):
-            move_bitboard = np.bitwise_and(PAWN_MOVES_BLACK[pawn_square], np.bitwise_not(board_occupancy))
+            move_bitboard = np.bitwise_and(
+                PAWN_MOVES_BLACK[pawn_square], np.bitwise_not(board_occupancy))
             for move_square in range(64):
                 if np.bitwise_and(move_bitboard, (np.uint64(1) << np.uint8(move_square))):
-                    pawn_moves.append(Move(start_square=pawn_square, end_square=move_square, move_type="BLACK PAWN MOVE"))
+                    pawn_moves.append(Move(
+                        start_square=pawn_square, end_square=move_square, move_type="BLACK PAWN MOVE"))
 
         if len(pawn_moves) == 1:
             if abs(pawn_moves[0].start_square - pawn_moves[0].end_square) == 16:
@@ -169,19 +196,21 @@ class Game():
     def generate_black_pawn_attacks(self, pawn_square, occupancy_white):
         pawn_attacks = []
         if np.bitwise_and(self.piece_bitboards["black_pawn"], (np.uint64(1) << np.uint8(pawn_square))):
-            move_bitboard = np.bitwise_and(PAWN_ATTACKS_BLACK[pawn_square], occupancy_white)
+            move_bitboard = np.bitwise_and(
+                PAWN_ATTACKS_BLACK[pawn_square], occupancy_white)
             for move_square in range(64):
                 if np.bitwise_and(move_bitboard, (np.uint64(1) << np.uint8(move_square))):
-                    pawn_attacks.append(Move(start_square=pawn_square, end_square=move_square, move_type="BLACK PAWN ATTACK"))
+                    pawn_attacks.append(Move(
+                        start_square=pawn_square, end_square=move_square, move_type="BLACK PAWN ATTACK"))
 
         return pawn_attacks
-
 
     def generate_knight_moves(self):
         knight_moves = []
 
         for knight_square in range(64):
-            knight_moves.extend(self.generate_single_knight_moves(knight_square))
+            knight_moves.extend(
+                self.generate_single_knight_moves(knight_square))
 
         return knight_moves
 
@@ -198,16 +227,20 @@ class Game():
 
         if self.color == COLOR_WHITE:
             if np.bitwise_and(self.piece_bitboards["white_knight"], (np.uint64(1) << np.uint8(knight_square))):
-                move_bitboard = np.bitwise_and(KNIGHT_MOVES[knight_square], np.bitwise_not(occupancy_white))
+                move_bitboard = np.bitwise_and(
+                    KNIGHT_MOVES[knight_square], np.bitwise_not(occupancy_white))
                 for move_square in range(64):
                     if np.bitwise_and(move_bitboard, (np.uint64(1) << np.uint8(move_square))):
-                        knight_moves.append(Move(start_square=knight_square, end_square=move_square, move_type="WHITE KNIGHT MOVE"))
+                        knight_moves.append(Move(
+                            start_square=knight_square, end_square=move_square, move_type="WHITE KNIGHT MOVE"))
         else:
             if np.bitwise_and(self.piece_bitboards["black_knight"], (np.uint64(1) << np.uint8(knight_square))):
-                move_bitboard = np.bitwise_and(KNIGHT_MOVES[knight_square], np.bitwise_not(occupancy_black))
+                move_bitboard = np.bitwise_and(
+                    KNIGHT_MOVES[knight_square], np.bitwise_not(occupancy_black))
                 for move_square in range(64):
                     if np.bitwise_and(move_bitboard, (np.uint64(1) << np.uint8(move_square))):
-                        knight_moves.append(Move(start_square=knight_square, end_square=move_square, move_type="BLACK KNIGHT MOVE"))
+                        knight_moves.append(Move(
+                            start_square=knight_square, end_square=move_square, move_type="BLACK KNIGHT MOVE"))
 
         return knight_moves
 
@@ -232,19 +265,22 @@ class Game():
 
         if self.color == COLOR_WHITE:
             if np.bitwise_and(self.piece_bitboards["white_king"], (np.uint64(1) << np.uint8(king_square))):
-                move_bitboard = np.bitwise_and(KING_MOVES[king_square], np.bitwise_not(occupancy_white))
+                move_bitboard = np.bitwise_and(
+                    KING_MOVES[king_square], np.bitwise_not(occupancy_white))
                 for move_square in range(64):
                     if np.bitwise_and(move_bitboard, (np.uint64(1) << np.uint8(move_square))):
-                        king_moves.append(Move(start_square=king_square, end_square=move_square, move_type="WHITE KING MOVE"))
+                        king_moves.append(Move(
+                            start_square=king_square, end_square=move_square, move_type="WHITE KING MOVE"))
         else:
             if np.bitwise_and(self.piece_bitboards["black_king"], (np.uint64(1) << np.uint8(king_square))):
-                move_bitboard = np.bitwise_and(KING_MOVES[king_square], np.bitwise_not(occupancy_black))
+                move_bitboard = np.bitwise_and(
+                    KING_MOVES[king_square], np.bitwise_not(occupancy_black))
                 for move_square in range(64):
                     if np.bitwise_and(move_bitboard, (np.uint64(1) << np.uint8(move_square))):
-                        king_moves.append(Move(start_square=king_square, end_square=move_square, move_type="BLACK KING MOVE"))
+                        king_moves.append(Move(
+                            start_square=king_square, end_square=move_square, move_type="BLACK KING MOVE"))
 
         return king_moves
-
 
     def generate_rook_moves(self):
         rook_moves = []
@@ -275,27 +311,31 @@ class Game():
 
         if self.color == COLOR_WHITE:
             if np.bitwise_and(self.piece_bitboards["white_rook"], (np.uint64(1) << np.uint8(rook_square))):
-                move_bitboard = np.bitwise_and(move_bitboard, np.bitwise_not(occupancy_white))
+                move_bitboard = np.bitwise_and(
+                    move_bitboard, np.bitwise_not(occupancy_white))
 
                 for move_square in range(64):
                     if np.bitwise_and(move_bitboard, (np.uint64(1) << np.uint8(move_square))):
-                        rook_moves.append(Move(start_square=rook_square, end_square=move_square, move_type="WHITE ROOK MOVE"))
+                        rook_moves.append(Move(
+                            start_square=rook_square, end_square=move_square, move_type="WHITE ROOK MOVE"))
         else:
             if np.bitwise_and(self.piece_bitboards["black_rook"], (np.uint64(1) << np.uint8(rook_square))):
-                move_bitboard = np.bitwise_and(move_bitboard, np.bitwise_not(occupancy_black))
+                move_bitboard = np.bitwise_and(
+                    move_bitboard, np.bitwise_not(occupancy_black))
 
                 for move_square in range(64):
                     if np.bitwise_and(move_bitboard, (np.uint64(1) << np.uint8(move_square))):
-                        rook_moves.append(Move(start_square=rook_square, end_square=move_square, move_type="BLACK ROOK MOVE"))
+                        rook_moves.append(Move(
+                            start_square=rook_square, end_square=move_square, move_type="BLACK ROOK MOVE"))
 
         return rook_moves
-
 
     def generate_bishop_moves(self):
         bishop_moves = []
 
         for bishop_square in range(64):
-            bishop_moves.extend(self.generate_single_bishop_moves(bishop_square))
+            bishop_moves.extend(
+                self.generate_single_bishop_moves(bishop_square))
 
         return bishop_moves
 
@@ -314,27 +354,31 @@ class Game():
 
         occupancy = np.bitwise_and(occupancy, BISHOP_MASKS[bishop_square])
         occupancy = occupancy * BISHOP_MAGIC_NUMBERS[bishop_square]
-        occupancy = occupancy >> np.uint8(64 - BISHOP_MAGIC_SHIFTS[bishop_square])
+        occupancy = occupancy >> np.uint8(
+            64 - BISHOP_MAGIC_SHIFTS[bishop_square])
 
         move_bitboard = BISHOP_MOVES[bishop_square][occupancy]
 
         if self.color == COLOR_WHITE:
             if np.bitwise_and(self.piece_bitboards["white_bishop"], (np.uint64(1) << np.uint8(bishop_square))):
-                move_bitboard = np.bitwise_and(move_bitboard, np.bitwise_not(occupancy_white))
+                move_bitboard = np.bitwise_and(
+                    move_bitboard, np.bitwise_not(occupancy_white))
 
                 for move_square in range(64):
                     if np.bitwise_and(move_bitboard, (np.uint64(1) << np.uint8(move_square))):
-                        bishop_moves.append(Move(start_square=bishop_square, end_square=move_square, move_type="WHITE BISHOP MOVE"))
+                        bishop_moves.append(Move(
+                            start_square=bishop_square, end_square=move_square, move_type="WHITE BISHOP MOVE"))
         else:
             if np.bitwise_and(self.piece_bitboards["black_bishop"], (np.uint64(1) << np.uint8(bishop_square))):
-                move_bitboard = np.bitwise_and(move_bitboard, np.bitwise_not(occupancy_black))
+                move_bitboard = np.bitwise_and(
+                    move_bitboard, np.bitwise_not(occupancy_black))
 
                 for move_square in range(64):
                     if np.bitwise_and(move_bitboard, (np.uint64(1) << np.uint8(move_square))):
-                        bishop_moves.append(Move(start_square=bishop_square, end_square=move_square, move_type="BLACK BISHOP MOVE"))
+                        bishop_moves.append(Move(
+                            start_square=bishop_square, end_square=move_square, move_type="BLACK BISHOP MOVE"))
 
         return bishop_moves
-
 
     def generate_queen_moves(self):
         queen_moves = []
@@ -358,46 +402,63 @@ class Game():
         occupancy_bishop = np.bitwise_or(occupancy_white, occupancy_black)
         occupancy_rook = np.bitwise_or(occupancy_white, occupancy_black)
 
-        occupancy_bishop = np.bitwise_and(occupancy_bishop, BISHOP_MASKS[queen_square])
-        occupancy_bishop = occupancy_bishop * BISHOP_MAGIC_NUMBERS[queen_square]
-        occupancy_bishop = occupancy_bishop >> np.uint8(64 - BISHOP_MAGIC_SHIFTS[queen_square])
+        occupancy_bishop = np.bitwise_and(
+            occupancy_bishop, BISHOP_MASKS[queen_square])
+        occupancy_bishop = occupancy_bishop * \
+            BISHOP_MAGIC_NUMBERS[queen_square]
+        occupancy_bishop = occupancy_bishop >> np.uint8(
+            64 - BISHOP_MAGIC_SHIFTS[queen_square])
         move_bitboard_bishop = BISHOP_MOVES[queen_square][occupancy_bishop]
 
-        occupancy_rook = np.bitwise_and(occupancy_rook, ROOK_MASKS[queen_square])
+        occupancy_rook = np.bitwise_and(
+            occupancy_rook, ROOK_MASKS[queen_square])
         occupancy_rook = occupancy_rook * ROOK_MAGIC_NUMBERS[queen_square]
-        occupancy_rook = occupancy_rook >> np.uint8(64 - ROOK_MAGIC_SHIFTS[queen_square])
+        occupancy_rook = occupancy_rook >> np.uint8(
+            64 - ROOK_MAGIC_SHIFTS[queen_square])
         move_bitboard_rook = ROOK_MOVES[queen_square][occupancy_rook]
 
         move_bitboard = np.bitwise_or(move_bitboard_bishop, move_bitboard_rook)
 
         if self.color == COLOR_WHITE:
             if np.bitwise_and(self.piece_bitboards["white_queen"], (np.uint64(1) << np.uint8(queen_square))):
-                move_bitboard = np.bitwise_and(move_bitboard, np.bitwise_not(occupancy_white))
+                move_bitboard = np.bitwise_and(
+                    move_bitboard, np.bitwise_not(occupancy_white))
 
                 for move_square in range(64):
                     if np.bitwise_and(move_bitboard, (np.uint64(1) << np.uint8(move_square))):
-                        queen_moves.append(Move(start_square=queen_square, end_square=move_square, move_type="WHITE QUEEN MOVE"))
+                        queen_moves.append(Move(
+                            start_square=queen_square, end_square=move_square, move_type="WHITE QUEEN MOVE"))
         else:
             if np.bitwise_and(self.piece_bitboards["black_queen"], (np.uint64(1) << np.uint8(queen_square))):
-                move_bitboard = np.bitwise_and(move_bitboard, np.bitwise_not(occupancy_black))
+                move_bitboard = np.bitwise_and(
+                    move_bitboard, np.bitwise_not(occupancy_black))
 
                 for move_square in range(64):
                     if np.bitwise_and(move_bitboard, (np.uint64(1) << np.uint8(move_square))):
-                        queen_moves.append(Move(start_square=queen_square, end_square=move_square, move_type="BLACK QUEEN MOVE"))
+                        queen_moves.append(Move(
+                            start_square=queen_square, end_square=move_square, move_type="BLACK QUEEN MOVE"))
 
         return queen_moves
 
     def check_pseudo_move(self, move):
         return True
-    
+
     def make_move(self, move):
         mover_type = self.get_piece_on_square(move.start_square)
         defender_type = self.get_piece_on_square(move.end_square)
-
-        self.piece_bitboards[mover_type] = unset_bitboard_bit(move.start_square, self.piece_bitboards[mover_type])
-        if defender_type:
-            self.piece_bitboards[defender_type] = unset_bitboard_bit(move.end_square, self.piece_bitboards[defender_type])
-        self.piece_bitboards[mover_type] = set_bitboard_bit(move.end_square, self.piece_bitboards[mover_type])
+        legal_moves = self.generate_moves()
+        evaluation = [True for legal_move in legal_moves if (move.start_square ==
+                                                             legal_move.start_square and move.end_square ==
+                                                             legal_move.end_square)]
+        if evaluation:
+            print("Works")
+            self.piece_bitboards[mover_type] = unset_bitboard_bit(
+                move.start_square, self.piece_bitboards[mover_type])
+            if defender_type:
+                self.piece_bitboards[defender_type] = unset_bitboard_bit(
+                    move.end_square, self.piece_bitboards[defender_type])
+            self.piece_bitboards[mover_type] = set_bitboard_bit(
+                move.end_square, self.piece_bitboards[mover_type])
 
     def get_piece_on_square(self, square):
         for piece_type, piece_bitboard in self.piece_bitboards.items():
