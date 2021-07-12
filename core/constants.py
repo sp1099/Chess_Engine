@@ -1,3 +1,4 @@
+import pickle
 import numpy as np
 
 from utils.bitboard_operations import *
@@ -54,11 +55,13 @@ def compute_white_pawn_moves(square):
 
     return move_bitboard
 
+
 PAWN_MOVES_WHITE = np.fromiter(
     (compute_white_pawn_moves(square) for square in range(64)),
     dtype=np.uint64,
     count=64
 )
+
 
 def compute_white_pawn_attacks(square):
     if square < 56:
@@ -74,6 +77,7 @@ def compute_white_pawn_attacks(square):
         move_bitboard = np.uint64(0)
 
     return move_bitboard
+
 
 PAWN_ATTACKS_WHITE = np.fromiter(
     (compute_white_pawn_attacks(square) for square in range(64)),
@@ -94,11 +98,13 @@ def compute_black_pawn_moves(square):
 
     return move_bitboard
 
+
 PAWN_MOVES_BLACK = np.fromiter(
     (compute_black_pawn_moves(square) for square in range(64)),
     dtype=np.uint64,
     count=64
 )
+
 
 def compute_black_pawn_attacks(square):
     if square > 7:
@@ -115,6 +121,7 @@ def compute_black_pawn_attacks(square):
 
     return move_bitboard
 
+
 PAWN_ATTACKS_BLACK = np.fromiter(
     (compute_black_pawn_attacks(square) for square in range(64)),
     dtype=np.uint64,
@@ -123,29 +130,43 @@ PAWN_ATTACKS_BLACK = np.fromiter(
 
 print("PAWNS DONE!")
 
+
 def compute_knight_moves(square):
     pos_bitboard = np.uint64(1) << np.uint8(square)
 
     move_bitboard = np.uint64(0)
-    move_bitboard = np.bitwise_or(move_bitboard, (pos_bitboard << np.uint8(10))) # 1 up, 2 left
-    move_bitboard = np.bitwise_or(move_bitboard, (pos_bitboard << np.uint8(17))) # 2 up, 1 left
-    move_bitboard = np.bitwise_or(move_bitboard, (pos_bitboard << np.uint8(15))) # 2 up, 1 right
-    move_bitboard = np.bitwise_or(move_bitboard, (pos_bitboard << np.uint8(6))) # 1 up, 2 right
-    move_bitboard = np.bitwise_or(move_bitboard, (pos_bitboard >> np.uint8(6))) # 1 down, 2 right
-    move_bitboard = np.bitwise_or(move_bitboard, (pos_bitboard >> np.uint8(15))) # 2 down, 1 right
-    move_bitboard = np.bitwise_or(move_bitboard, (pos_bitboard >> np.uint8(17))) # 2 down, 1 left
-    move_bitboard = np.bitwise_or(move_bitboard, (pos_bitboard >> np.uint8(10))) # 1 down, 2 left
+    move_bitboard = np.bitwise_or(
+        move_bitboard, (pos_bitboard << np.uint8(10)))  # 1 up, 2 left
+    move_bitboard = np.bitwise_or(
+        move_bitboard, (pos_bitboard << np.uint8(17)))  # 2 up, 1 left
+    move_bitboard = np.bitwise_or(
+        move_bitboard, (pos_bitboard << np.uint8(15)))  # 2 up, 1 right
+    move_bitboard = np.bitwise_or(
+        move_bitboard, (pos_bitboard << np.uint8(6)))  # 1 up, 2 right
+    move_bitboard = np.bitwise_or(
+        move_bitboard, (pos_bitboard >> np.uint8(6)))  # 1 down, 2 right
+    move_bitboard = np.bitwise_or(
+        move_bitboard, (pos_bitboard >> np.uint8(15)))  # 2 down, 1 right
+    move_bitboard = np.bitwise_or(
+        move_bitboard, (pos_bitboard >> np.uint8(17)))  # 2 down, 1 left
+    move_bitboard = np.bitwise_or(
+        move_bitboard, (pos_bitboard >> np.uint8(10)))  # 1 down, 2 left
 
     if square % 8 in [0, 1]:
-        move_bitboard = np.bitwise_and(move_bitboard, np.bitwise_not(np.uint64(0xC0C0C0C0C0C0C0C0)))
+        move_bitboard = np.bitwise_and(
+            move_bitboard, np.bitwise_not(np.uint64(0xC0C0C0C0C0C0C0C0)))
     elif square % 8 in [6, 7]:
-        move_bitboard = np.bitwise_and(move_bitboard, np.bitwise_not(np.uint64(0x0303030303030303)))
+        move_bitboard = np.bitwise_and(
+            move_bitboard, np.bitwise_not(np.uint64(0x0303030303030303)))
     if square <= 15:
-        move_bitboard = np.bitwise_and(move_bitboard, np.bitwise_not(np.uint64(0xFFFF000000000000)))
+        move_bitboard = np.bitwise_and(
+            move_bitboard, np.bitwise_not(np.uint64(0xFFFF000000000000)))
     elif square >= 48:
-        move_bitboard = np.bitwise_and(move_bitboard, np.bitwise_not(np.uint64(0x000000000000FFFF)))
+        move_bitboard = np.bitwise_and(
+            move_bitboard, np.bitwise_not(np.uint64(0x000000000000FFFF)))
 
     return move_bitboard
+
 
 KNIGHT_MOVES = np.fromiter(
     (compute_knight_moves(square) for square in range(64)),
@@ -154,6 +175,7 @@ KNIGHT_MOVES = np.fromiter(
 )
 
 print("KNIGHTS DONE!")
+
 
 def compute_king_moves(square):
     pos_bitboard = np.uint64(1) << np.uint8(square)
@@ -169,15 +191,20 @@ def compute_king_moves(square):
     move_bitboard = np.bitwise_or(move_bitboard, (pos_bitboard >> np.uint8(9)))
 
     if square % 8 == 0:
-        move_bitboard = np.bitwise_and(move_bitboard, np.bitwise_not(np.uint64(0x8080808080808080)))
+        move_bitboard = np.bitwise_and(
+            move_bitboard, np.bitwise_not(np.uint64(0x8080808080808080)))
     elif square % 8 == 7:
-        move_bitboard = np.bitwise_and(move_bitboard, np.bitwise_not(np.uint64(0x0101010101010101)))
+        move_bitboard = np.bitwise_and(
+            move_bitboard, np.bitwise_not(np.uint64(0x0101010101010101)))
     if square <= 7:
-        move_bitboard = np.bitwise_and(move_bitboard, np.bitwise_not(np.uint64(0xFF00000000000000)))
+        move_bitboard = np.bitwise_and(
+            move_bitboard, np.bitwise_not(np.uint64(0xFF00000000000000)))
     elif square >= 56:
-        move_bitboard = np.bitwise_and(move_bitboard, np.bitwise_not(np.uint64(0x00000000000000FF)))
+        move_bitboard = np.bitwise_and(
+            move_bitboard, np.bitwise_not(np.uint64(0x00000000000000FF)))
 
     return move_bitboard
+
 
 KING_MOVES = np.fromiter(
     (compute_king_moves(square) for square in range(64)),
@@ -190,6 +217,8 @@ print("KINGS DONE!")
 # Sliding Pieces
 
 # Bishop
+
+
 def mask_bishop_moves(square):
     move_bitboard = np.uint64(0)
 
@@ -200,7 +229,8 @@ def mask_bishop_moves(square):
     rank = square_rank + 1
     file = square_file + 1
     while (rank <= 6 and file <= 6):
-        move_bitboard = np.bitwise_or(move_bitboard, np.uint64(1) << np.uint8(8 * rank + file))
+        move_bitboard = np.bitwise_or(
+            move_bitboard, np.uint64(1) << np.uint8(8 * rank + file))
         rank += 1
         file += 1
 
@@ -208,7 +238,8 @@ def mask_bishop_moves(square):
     rank = square_rank - 1
     file = square_file + 1
     while (rank >= 1 and file <= 6):
-        move_bitboard = np.bitwise_or(move_bitboard, np.uint64(1) << np.uint8(8 * rank + file))
+        move_bitboard = np.bitwise_or(
+            move_bitboard, np.uint64(1) << np.uint8(8 * rank + file))
         rank -= 1
         file += 1
 
@@ -216,7 +247,8 @@ def mask_bishop_moves(square):
     rank = square_rank + 1
     file = square_file - 1
     while (rank <= 6 and file >= 1):
-        move_bitboard = np.bitwise_or(move_bitboard, np.uint64(1) << np.uint8(8 * rank + file))
+        move_bitboard = np.bitwise_or(
+            move_bitboard, np.uint64(1) << np.uint8(8 * rank + file))
         rank += 1
         file -= 1
 
@@ -224,11 +256,13 @@ def mask_bishop_moves(square):
     rank = square_rank - 1
     file = square_file - 1
     while (rank >= 1 and file >= 1):
-        move_bitboard = np.bitwise_or(move_bitboard, np.uint64(1) << np.uint8(8 * rank + file))
+        move_bitboard = np.bitwise_or(
+            move_bitboard, np.uint64(1) << np.uint8(8 * rank + file))
         rank -= 1
         file -= 1
 
     return move_bitboard
+
 
 def calculate_bishop_moves(square, block_bitboard):
     move_bitboard = np.uint64(0)
@@ -240,7 +274,8 @@ def calculate_bishop_moves(square, block_bitboard):
     rank = square_rank + 1
     file = square_file + 1
     while (rank <= 7 and file <= 7):
-        move_bitboard = np.bitwise_or(move_bitboard, np.uint64(1) << np.uint8(8 * rank + file))
+        move_bitboard = np.bitwise_or(
+            move_bitboard, np.uint64(1) << np.uint8(8 * rank + file))
         if np.bitwise_and(block_bitboard, np.uint64(1) << np.uint8(8 * rank + file)):
             break
         rank += 1
@@ -250,7 +285,8 @@ def calculate_bishop_moves(square, block_bitboard):
     rank = square_rank - 1
     file = square_file + 1
     while (rank >= 0 and file <= 7):
-        move_bitboard = np.bitwise_or(move_bitboard, np.uint64(1) << np.uint8(8 * rank + file))
+        move_bitboard = np.bitwise_or(
+            move_bitboard, np.uint64(1) << np.uint8(8 * rank + file))
         if np.bitwise_and(block_bitboard, np.uint64(1) << np.uint8(8 * rank + file)):
             break
         rank -= 1
@@ -260,7 +296,8 @@ def calculate_bishop_moves(square, block_bitboard):
     rank = square_rank + 1
     file = square_file - 1
     while (rank <= 7 and file >= 0):
-        move_bitboard = np.bitwise_or(move_bitboard, np.uint64(1) << np.uint8(8 * rank + file))
+        move_bitboard = np.bitwise_or(
+            move_bitboard, np.uint64(1) << np.uint8(8 * rank + file))
         if np.bitwise_and(block_bitboard, np.uint64(1) << np.uint8(8 * rank + file)):
             break
         rank += 1
@@ -270,7 +307,8 @@ def calculate_bishop_moves(square, block_bitboard):
     rank = square_rank - 1
     file = square_file - 1
     while (rank >= 0 and file >= 0):
-        move_bitboard = np.bitwise_or(move_bitboard, np.uint64(1) << np.uint8(8 * rank + file))
+        move_bitboard = np.bitwise_or(
+            move_bitboard, np.uint64(1) << np.uint8(8 * rank + file))
         if np.bitwise_and(block_bitboard, np.uint64(1) << np.uint8(8 * rank + file)):
             break
         rank -= 1
@@ -279,6 +317,8 @@ def calculate_bishop_moves(square, block_bitboard):
     return move_bitboard
 
 # Rook
+
+
 def mask_rook_moves(square):
     move_bitboard = np.uint64(0)
 
@@ -288,28 +328,33 @@ def mask_rook_moves(square):
     # Direction (1, 0)
     rank = square_rank + 1
     while (rank <= 6):
-        move_bitboard = np.bitwise_or(move_bitboard, np.uint64(1) << np.uint8(8 * rank + square_file))
+        move_bitboard = np.bitwise_or(move_bitboard, np.uint64(
+            1) << np.uint8(8 * rank + square_file))
         rank += 1
 
     # Direction -(1, 0)
     rank = square_rank - 1
     while (rank >= 1):
-        move_bitboard = np.bitwise_or(move_bitboard, np.uint64(1) << np.uint8(8 * rank + square_file))
+        move_bitboard = np.bitwise_or(move_bitboard, np.uint64(
+            1) << np.uint8(8 * rank + square_file))
         rank -= 1
 
     # Direction (0, 1)
     file = square_file + 1
     while (file <= 6):
-        move_bitboard = np.bitwise_or(move_bitboard, np.uint64(1) << np.uint8(8 * square_rank + file))
+        move_bitboard = np.bitwise_or(move_bitboard, np.uint64(
+            1) << np.uint8(8 * square_rank + file))
         file += 1
 
     # Direction (0, -1)
     file = square_file - 1
     while (file >= 1):
-        move_bitboard = np.bitwise_or(move_bitboard, np.uint64(1) << np.uint8(8 * square_rank + file))
+        move_bitboard = np.bitwise_or(move_bitboard, np.uint64(
+            1) << np.uint8(8 * square_rank + file))
         file -= 1
 
     return move_bitboard
+
 
 def calculate_rook_moves(square, block_bitboard):
     move_bitboard = np.uint64(0)
@@ -320,7 +365,8 @@ def calculate_rook_moves(square, block_bitboard):
     # Direction (1, 0)
     rank = square_rank + 1
     while (rank <= 7):
-        move_bitboard = np.bitwise_or(move_bitboard, np.uint64(1) << np.uint8(8 * rank + square_file))
+        move_bitboard = np.bitwise_or(move_bitboard, np.uint64(
+            1) << np.uint8(8 * rank + square_file))
         if (np.bitwise_and(block_bitboard, np.uint64(1) << np.uint8(8 * rank + square_file))):
             break
         rank += 1
@@ -328,7 +374,8 @@ def calculate_rook_moves(square, block_bitboard):
     # Direction -(1, 0)
     rank = square_rank - 1
     while (rank >= 0):
-        move_bitboard = np.bitwise_or(move_bitboard, np.uint64(1) << np.uint8(8 * rank + square_file))
+        move_bitboard = np.bitwise_or(move_bitboard, np.uint64(
+            1) << np.uint8(8 * rank + square_file))
         if (np.bitwise_and(block_bitboard, np.uint64(1) << np.uint8(8 * rank + square_file))):
             break
         rank -= 1
@@ -336,7 +383,8 @@ def calculate_rook_moves(square, block_bitboard):
     # Direction (0, 1)
     file = square_file + 1
     while (file <= 7):
-        move_bitboard = np.bitwise_or(move_bitboard, np.uint64(1) << np.uint8(8 * square_rank + file))
+        move_bitboard = np.bitwise_or(move_bitboard, np.uint64(
+            1) << np.uint8(8 * square_rank + file))
         if (np.bitwise_and(block_bitboard, np.uint64(1) << np.uint8(8 * square_rank + file))):
             break
         file += 1
@@ -344,12 +392,14 @@ def calculate_rook_moves(square, block_bitboard):
     # Direction (0, -1)
     file = square_file - 1
     while (file >= 0):
-        move_bitboard = np.bitwise_or(move_bitboard, np.uint64(1) << np.uint8(8 * square_rank + file))
+        move_bitboard = np.bitwise_or(move_bitboard, np.uint64(
+            1) << np.uint8(8 * square_rank + file))
         if (np.bitwise_and(block_bitboard, np.uint64(1) << np.uint8(8 * square_rank + file))):
             break
         file -= 1
 
     return move_bitboard
+
 
 def set_occupancy(index, bits_in_mask, move_mask):
     occupancy = np.uint64(0)
@@ -357,7 +407,8 @@ def set_occupancy(index, bits_in_mask, move_mask):
         square = get_ls1b_index(move_mask)
         move_mask = unset_bitboard_bit(square, move_mask)
         if np.bitwise_and(np.uint16(index), np.uint64(1) << np.uint8(bit_count)):
-            occupancy = np.bitwise_or(occupancy, np.uint64(1) << np.uint8(square))
+            occupancy = np.bitwise_or(
+                occupancy, np.uint64(1) << np.uint8(square))
 
     return occupancy
 
@@ -433,21 +484,21 @@ BISHOP_MAGIC_NUMBERS = np.array(
         0x8918844842082200,
         0x4010011029020020
     ],
-    dtype = np.uint64
+    dtype=np.uint64
 )
 # Bishop Magic Shifts
 BISHOP_MAGIC_SHIFTS = np.array(
     [
-        6, 5, 5, 5, 5, 5, 5, 6, 
-        5, 5, 5, 5, 5, 5, 5, 5, 
-        5, 5, 7, 7, 7, 7, 5, 5, 
-        5, 5, 7, 9, 9, 7, 5, 5, 
-        5, 5, 7, 9, 9, 7, 5, 5, 
-        5, 5, 7, 7, 7, 7, 5, 5, 
-        5, 5, 5, 5, 5, 5, 5, 5, 
+        6, 5, 5, 5, 5, 5, 5, 6,
+        5, 5, 5, 5, 5, 5, 5, 5,
+        5, 5, 7, 7, 7, 7, 5, 5,
+        5, 5, 7, 9, 9, 7, 5, 5,
+        5, 5, 7, 9, 9, 7, 5, 5,
+        5, 5, 7, 7, 7, 7, 5, 5,
+        5, 5, 5, 5, 5, 5, 5, 5,
         6, 5, 5, 5, 5, 5, 5, 6
     ],
-    dtype = np.uint8
+    dtype=np.uint8
 )
 # Rook Magic Numbers
 ROOK_MAGIC_NUMBERS = np.array(
@@ -517,21 +568,21 @@ ROOK_MAGIC_NUMBERS = np.array(
         0x2006104900a0804,
         0x1004081002402
     ],
-    dtype = np.uint64
+    dtype=np.uint64
 )
 # Rook Magic Shifts
 ROOK_MAGIC_SHIFTS = np.array(
     [
-        12, 11, 11, 11, 11, 11, 11, 12, 
-        11, 10, 10, 10, 10, 10, 10, 11, 
-        11, 10, 10, 10, 10, 10, 10, 11, 
-        11, 10, 10, 10, 10, 10, 10, 11, 
-        11, 10, 10, 10, 10, 10, 10, 11, 
-        11, 10, 10, 10, 10, 10, 10, 11, 
-        11, 10, 10, 10, 10, 10, 10, 11, 
+        12, 11, 11, 11, 11, 11, 11, 12,
+        11, 10, 10, 10, 10, 10, 10, 11,
+        11, 10, 10, 10, 10, 10, 10, 11,
+        11, 10, 10, 10, 10, 10, 10, 11,
+        11, 10, 10, 10, 10, 10, 10, 11,
+        11, 10, 10, 10, 10, 10, 10, 11,
+        11, 10, 10, 10, 10, 10, 10, 11,
         12, 11, 11, 11, 11, 11, 11, 12
     ],
-    dtype = np.uint8
+    dtype=np.uint8
 )
 
 # Bishop Tables
@@ -542,8 +593,22 @@ BISHOP_MOVES = np.zeros((64, 512), dtype=np.uint64)
 ROOK_MASKS = np.zeros(64, dtype=np.uint64)
 ROOK_MOVES = np.zeros((64, 4096), dtype=np.uint64)
 
+with open('rook_masks.pkl', 'rb') as f:
+    ROOK_MASKS = pickle.load(f)
+
+with open('rook_moves.pkl', 'rb') as f:
+    ROOK_MOVES = pickle.load(f)
+
+with open('bishop_masks.pkl', 'rb') as f:
+    BISHOP_MASKS = pickle.load(f)
+
+with open('bishop_moves.pkl', 'rb') as f:
+    BISHOP_MOVES = pickle.load(f)
+
 
 # Init Slider Tables
+
+
 def init_slider_tables(bishop):
 
     for square in range(64):
@@ -563,7 +628,8 @@ def init_slider_tables(bishop):
             #print("INDEX: ", index)
             if bishop:
                 #index = 9
-                occupancy = set_occupancy(index, relevant_bits_count, move_mask)
+                occupancy = set_occupancy(
+                    index, relevant_bits_count, move_mask)
                 # print_bitboard(occupancy)
                 # input()
                 # file.write(str(index) + "\n")
@@ -572,22 +638,37 @@ def init_slider_tables(bishop):
                 #     file.write(rank+"\n")
                 # file.write("\n\n")
 
-                magic_index = (occupancy * BISHOP_MAGIC_NUMBERS[square]) >> np.uint8(64 - BISHOP_MAGIC_SHIFTS[square])
+                magic_index = (
+                    occupancy * BISHOP_MAGIC_NUMBERS[square]) >> np.uint8(64 - BISHOP_MAGIC_SHIFTS[square])
 
-                BISHOP_MOVES[square][magic_index] = calculate_bishop_moves(square, occupancy)
-            
+                BISHOP_MOVES[square][magic_index] = calculate_bishop_moves(
+                    square, occupancy)
+
             else:
-                occupancy = set_occupancy(index, relevant_bits_count, move_mask)
+                occupancy = set_occupancy(
+                    index, relevant_bits_count, move_mask)
 
-                magic_index = (occupancy * ROOK_MAGIC_NUMBERS[square]) >> np.uint8(64 - ROOK_MAGIC_SHIFTS[square])
+                magic_index = (
+                    occupancy * ROOK_MAGIC_NUMBERS[square]) >> np.uint8(64 - ROOK_MAGIC_SHIFTS[square])
 
-                ROOK_MOVES[square][magic_index] = calculate_rook_moves(square, occupancy)
-            
+                ROOK_MOVES[square][magic_index] = calculate_rook_moves(
+                    square, occupancy)
 
-init_slider_tables(True)
-init_slider_tables(False)
 
+# init_slider_tables(True)
+# init_slider_tables(False)
+
+# with open('rook_masks.pkl', 'wb') as f:
+#     pickle.dump(ROOK_MASKS, f, protocol=pickle.HIGHEST_PROTOCOL)
+
+# with open('rook_moves.pkl', 'wb') as f:
+#     pickle.dump(ROOK_MOVES, f, protocol=pickle.HIGHEST_PROTOCOL)
+
+# with open('bishop_masks.pkl', 'wb') as f:
+#     pickle.dump(BISHOP_MASKS, f, protocol=pickle.HIGHEST_PROTOCOL)
+
+# with open('bishop_moves.pkl', 'wb') as f:
+#     pickle.dump(BISHOP_MOVES, f, protocol=pickle.HIGHEST_PROTOCOL)
 
 print("SLIDERS DONE!")
 print("INTIALIZATION DONE!")
-
