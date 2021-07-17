@@ -459,6 +459,10 @@ class Game():
                     move.end_square, self.piece_bitboards[defender_type])
             self.piece_bitboards[mover_type] = set_bitboard_bit(
                 move.end_square, self.piece_bitboards[mover_type])
+            return True
+        else:
+            print("Not a valid move")
+            return False
 
     def get_piece_on_square(self, square):
         for piece_type, piece_bitboard in self.piece_bitboards.items():
