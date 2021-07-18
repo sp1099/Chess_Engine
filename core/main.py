@@ -6,12 +6,24 @@ import numpy as np
 from utils.bitboard_operations import unset_bitboard_bit, set_bitboard_bit, get_bitboard_bit, print_bitboard
 from game import Game
 import move
+from humanPlayer import humanPlayer
 
 
 def main():
     pygame.init()
     gui = GUI(800, 600)
     gui.load_pieces()
+    # tracks which players turn --> 0 white and 1 black
+    current_color = 0
+
+    # instantiate human Players
+    p_white = humanPlayer(gui.game.piece_bitboards, 0)
+    p_black = humanPlayer(gui.game.piece_bitboards, 1)
+    players = [p_white, p_black]
+
+    # keeps track whether a turn is finished
+    turn_finished = False
+
     selected_piece = None
     x_old = -1
     y_old = -1
@@ -26,12 +38,19 @@ def main():
                 quit()
 
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if piece != None:
-                    selected_piece, x_old, y_old = piece, x, y
-                    print("X_old: " + str(x) + " Y_old:" + str(y))
-                    # print(str(piece))
+                # check if a piece was selected and if its the human player turn
+                if piece != None and isinstance(players[current_color], humanPlayer):
+                    # check if the selecting human player is allowed to move pieces of the selected color
+                    if (current_color == 0 and "white" in piece) or (current_color == 1 and "black" in piece):
+                        selected_piece, x_old, y_old = piece, x, y
+                        print("X_old: " + str(x) + " Y_old:" + str(y))
+                        # print(str(piece))
+                    else:
+                        piece = None
+                else:
+                    piece = None
             if event.type == pygame.MOUSEBUTTONUP:
-                if piece != None:
+                if piece != None and selected_piece != None:
                     print("Selected: " + selected_piece)
                     if piece == "":
                         print("Move to: " + "empty_field at: x=" +
@@ -47,8 +66,11 @@ def main():
                     # TODO: Send data here to engine and get new bitboards to draw
                     else:
                         # create a move
-                        generated_move = move.Move(x_old+y_old*8, x+y*8)
-                        gui.game.make_move(generated_move)
+                        player_move = players[current_color].get_player_move(
+                            x_old+y_old*8, x+y*8)
+
+                        turn_finished = gui.game.make_move(
+                            player_move, current_color)
                         # # TODO: ENTFERNEN und durch ENGINE AKTUALISIERUNG ERSETZEN
                         # gui.game.piece_bitboards[selected_piece] = unset_bitboard_bit(
                         #     x_old+8*y_old, gui.game.piece_bitboards[selected_piece])
@@ -61,6 +83,11 @@ def main():
                 selected_piece = None
                 x_old = -1
                 y_old = -1
+
+        if turn_finished:
+            # change players turn when finished
+            current_color = 1 if current_color == 0 else 0
+            turn_finished = False
 
         gui.draw_pieces(gui.game.piece_bitboards)
         pygame.display.flip()

@@ -443,7 +443,8 @@ class Game():
     def check_pseudo_move(self, move):
         return True
 
-    def make_move(self, move):
+    def make_move(self, move, color):
+        self.color = color
         mover_type = self.get_piece_on_square(move.start_square)
         defender_type = self.get_piece_on_square(move.end_square)
         legal_moves = self.generate_moves()
