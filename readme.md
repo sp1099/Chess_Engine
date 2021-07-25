@@ -10,14 +10,15 @@
     - [x] Bishop Moves
     - [x] Rook Moves
     - [x] Queen Moves
-    - [ ] Check, if king is in check after a move
+    - [x] Check, if king is in check after a move
+    - [ ] Pawn Promotion
 - [ ] make_move Function
     - [x] Reset Start Square
     - [x] Reset End Square
     - [x] Set End Square
-    - [ ] Set En Passant Target Square, if necessary
-    - [ ] Update Castling Rights, if necessary
-    - [ ] Check if Checkmate 
+    - [x] Set En Passant Target Square, if necessary
+    - [x] Update Castling Rights, if necessary
+    - [x] Check if Checkmate 
 
 ## Chess AI
 - [ ] Neural Network Structure
