@@ -69,8 +69,10 @@ def main():
                         player_move = players[current_color].get_player_move(
                             x_old+y_old*8, x+y*8)
 
-                        turn_finished = gui.game.make_move(
-                            player_move, current_color)
+                        turn_finished, game_finished = gui.game.make_move(
+                            player_move)
+                        if game_finished:
+                            print("FINISHED")
                         # # TODO: ENTFERNEN und durch ENGINE AKTUALISIERUNG ERSETZEN
                         # gui.game.piece_bitboards[selected_piece] = unset_bitboard_bit(
                         #     x_old+8*y_old, gui.game.piece_bitboards[selected_piece])

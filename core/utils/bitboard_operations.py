@@ -1,15 +1,19 @@
 import numpy as np
 
+
 def print_bitboard(bitboard):
-            ranks = [np.binary_repr(bitboard, 64)[i:i+8][::-1] for i in range(0, 64, 8)]
-            for rank in ranks:
-                print(rank)
-            print()
+    ranks = [np.binary_repr(bitboard, 64)[i:i+8][::-1]
+             for i in range(0, 64, 8)]
+    for rank in ranks:
+        print(rank)
+    print()
+
 
 def set_bitboard_bit(index, bitboard):
-        set_board = np.uint64(1) << np.uint8(index)
-        bitboard = np.bitwise_or(bitboard, set_board)
-        return bitboard
+    set_board = np.uint64(1) << np.uint8(index)
+    bitboard = np.bitwise_or(bitboard, set_board)
+    return bitboard
+
 
 def unset_bitboard_bit(index, bitboard):
     set_board = np.uint64(1) << np.uint8(index)
@@ -17,10 +21,12 @@ def unset_bitboard_bit(index, bitboard):
     bitboard = np.bitwise_and(bitboard, unset_board)
     return bitboard
 
+
 def get_bitboard_bit(index, bitboard):
     pos_board = np.uint64(1) << np.uint8(index)
     get_board = np.bitwise_and(bitboard, pos_board)
     return get_board
+
 
 def count_bitboard_bits(bitboard):
     count = 0
@@ -30,15 +36,18 @@ def count_bitboard_bits(bitboard):
     while bitboard:
         count += 1
         bitboard = np.bitwise_and(bitboard, np.uint64(bitboard - np.uint8(1)))
-    
+
     return count
+
 
 def get_ls1b_index(bitboard):
     if bitboard:
-        index = count_bitboard_bits(np.bitwise_and(bitboard, -bitboard) - np.uint8(1))
+        index = count_bitboard_bits(np.bitwise_and(
+            bitboard, -bitboard) - np.uint8(1))
         return index
     else:
         return -1
+
 
 #move_mask = np.uint64(0x0040201008040200)
 # move_mask = np.uint64(0x0040000000000000)
