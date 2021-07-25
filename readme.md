@@ -3,7 +3,7 @@
 - [ ] Piece Movements
     - [x] Pawn Moves
     - [x] Pawn Attacks
-    - [ ] En Passant
+    - [x] En Passant
     - [x] Knight Moves
     - [x] King Moves
     - [ ] Castling

@@ -10,6 +10,10 @@ class Game():
     def __init__(self):
 
         self.color = COLOR_WHITE
+        self.en_passant_target = np.uint64(0)
+        # 1  2  4  8
+        # wk wq bk bq
+        self.castling_rights = np.uint8(15)
 
         self.piece_bitboards = {
             "white_pawn": np.uint64(0),
@@ -157,7 +161,7 @@ class Game():
             for move_square in range(64):
                 if np.bitwise_and(move_bitboard, (np.uint64(1) << np.uint8(move_square))):
                     pawn_moves.append(Move(
-                        start_square=pawn_square, end_square=move_square, move_type="WHITE PAWN MOVE"))
+                        start_square=pawn_square, end_square=move_square, piece_type=PAWN))
 
         if len(pawn_moves) == 1:
             if abs(pawn_moves[0].start_square - pawn_moves[0].end_square) == 16:
@@ -169,11 +173,11 @@ class Game():
         pawn_attacks = []
         if np.bitwise_and(self.piece_bitboards["white_pawn"], (np.uint64(1) << np.uint8(pawn_square))):
             move_bitboard = np.bitwise_and(
-                PAWN_ATTACKS_WHITE[pawn_square], occupancy_black)
+                PAWN_ATTACKS_WHITE[pawn_square], np.bitwise_or(occupancy_black, self.en_passant_target))
             for move_square in range(64):
                 if np.bitwise_and(move_bitboard, (np.uint64(1) << np.uint8(move_square))):
                     pawn_attacks.append(Move(
-                        start_square=pawn_square, end_square=move_square, move_type="WHITE PAWN ATTACK"))
+                        start_square=pawn_square, end_square=move_square, piece_type=PAWN))
 
         return pawn_attacks
 
@@ -185,7 +189,7 @@ class Game():
             for move_square in range(64):
                 if np.bitwise_and(move_bitboard, (np.uint64(1) << np.uint8(move_square))):
                     pawn_moves.append(Move(
-                        start_square=pawn_square, end_square=move_square, move_type="BLACK PAWN MOVE"))
+                        start_square=pawn_square, end_square=move_square, piece_type=PAWN))
 
         if len(pawn_moves) == 1:
             if abs(pawn_moves[0].start_square - pawn_moves[0].end_square) == 16:
@@ -197,11 +201,11 @@ class Game():
         pawn_attacks = []
         if np.bitwise_and(self.piece_bitboards["black_pawn"], (np.uint64(1) << np.uint8(pawn_square))):
             move_bitboard = np.bitwise_and(
-                PAWN_ATTACKS_BLACK[pawn_square], occupancy_white)
+                PAWN_ATTACKS_BLACK[pawn_square], np.bitwise_or(occupancy_white, self.en_passant_target))
             for move_square in range(64):
                 if np.bitwise_and(move_bitboard, (np.uint64(1) << np.uint8(move_square))):
                     pawn_attacks.append(Move(
-                        start_square=pawn_square, end_square=move_square, move_type="BLACK PAWN ATTACK"))
+                        start_square=pawn_square, end_square=move_square, piece_type=PAWN))
 
         return pawn_attacks
 
@@ -232,7 +236,7 @@ class Game():
                 for move_square in range(64):
                     if np.bitwise_and(move_bitboard, (np.uint64(1) << np.uint8(move_square))):
                         knight_moves.append(Move(
-                            start_square=knight_square, end_square=move_square, move_type="WHITE KNIGHT MOVE"))
+                            start_square=knight_square, end_square=move_square, piece_type=KNIGHT))
         else:
             if np.bitwise_and(self.piece_bitboards["black_knight"], (np.uint64(1) << np.uint8(knight_square))):
                 move_bitboard = np.bitwise_and(
@@ -240,7 +244,7 @@ class Game():
                 for move_square in range(64):
                     if np.bitwise_and(move_bitboard, (np.uint64(1) << np.uint8(move_square))):
                         knight_moves.append(Move(
-                            start_square=knight_square, end_square=move_square, move_type="BLACK KNIGHT MOVE"))
+                            start_square=knight_square, end_square=move_square, piece_type=KNIGHT))
 
         return knight_moves
 
@@ -270,7 +274,7 @@ class Game():
                 for move_square in range(64):
                     if np.bitwise_and(move_bitboard, (np.uint64(1) << np.uint8(move_square))):
                         king_moves.append(Move(
-                            start_square=king_square, end_square=move_square, move_type="WHITE KING MOVE"))
+                            start_square=king_square, end_square=move_square, piece_type=KING))
         else:
             if np.bitwise_and(self.piece_bitboards["black_king"], (np.uint64(1) << np.uint8(king_square))):
                 move_bitboard = np.bitwise_and(
@@ -278,7 +282,7 @@ class Game():
                 for move_square in range(64):
                     if np.bitwise_and(move_bitboard, (np.uint64(1) << np.uint8(move_square))):
                         king_moves.append(Move(
-                            start_square=king_square, end_square=move_square, move_type="BLACK KING MOVE"))
+                            start_square=king_square, end_square=move_square, piece_type=KING))
 
         return king_moves
 
@@ -317,7 +321,7 @@ class Game():
                 for move_square in range(64):
                     if np.bitwise_and(move_bitboard, (np.uint64(1) << np.uint8(move_square))):
                         rook_moves.append(Move(
-                            start_square=rook_square, end_square=move_square, move_type="WHITE ROOK MOVE"))
+                            start_square=rook_square, end_square=move_square, piece_type=ROOK))
         else:
             if np.bitwise_and(self.piece_bitboards["black_rook"], (np.uint64(1) << np.uint8(rook_square))):
                 move_bitboard = np.bitwise_and(
@@ -326,7 +330,7 @@ class Game():
                 for move_square in range(64):
                     if np.bitwise_and(move_bitboard, (np.uint64(1) << np.uint8(move_square))):
                         rook_moves.append(Move(
-                            start_square=rook_square, end_square=move_square, move_type="BLACK ROOK MOVE"))
+                            start_square=rook_square, end_square=move_square, piece_type=ROOK))
 
         return rook_moves
 
@@ -367,7 +371,7 @@ class Game():
                 for move_square in range(64):
                     if np.bitwise_and(move_bitboard, (np.uint64(1) << np.uint8(move_square))):
                         bishop_moves.append(Move(
-                            start_square=bishop_square, end_square=move_square, move_type="WHITE BISHOP MOVE"))
+                            start_square=bishop_square, end_square=move_square, piece_type=BISHOP))
         else:
             if np.bitwise_and(self.piece_bitboards["black_bishop"], (np.uint64(1) << np.uint8(bishop_square))):
                 move_bitboard = np.bitwise_and(
@@ -376,7 +380,7 @@ class Game():
                 for move_square in range(64):
                     if np.bitwise_and(move_bitboard, (np.uint64(1) << np.uint8(move_square))):
                         bishop_moves.append(Move(
-                            start_square=bishop_square, end_square=move_square, move_type="BLACK BISHOP MOVE"))
+                            start_square=bishop_square, end_square=move_square, piece_type=BISHOP))
 
         return bishop_moves
 
@@ -427,7 +431,7 @@ class Game():
                 for move_square in range(64):
                     if np.bitwise_and(move_bitboard, (np.uint64(1) << np.uint8(move_square))):
                         queen_moves.append(Move(
-                            start_square=queen_square, end_square=move_square, move_type="WHITE QUEEN MOVE"))
+                            start_square=queen_square, end_square=move_square, piece_type=QUEEN))
         else:
             if np.bitwise_and(self.piece_bitboards["black_queen"], (np.uint64(1) << np.uint8(queen_square))):
                 move_bitboard = np.bitwise_and(
@@ -436,7 +440,7 @@ class Game():
                 for move_square in range(64):
                     if np.bitwise_and(move_bitboard, (np.uint64(1) << np.uint8(move_square))):
                         queen_moves.append(Move(
-                            start_square=queen_square, end_square=move_square, move_type="BLACK QUEEN MOVE"))
+                            start_square=queen_square, end_square=move_square, piece_type=QUEEN))
 
         return queen_moves
 
@@ -453,13 +457,55 @@ class Game():
                                                              legal_move.end_square)]
         if evaluation:
             print("Works")
+
+            # Unset mover_bitboard at start pos
             self.piece_bitboards[mover_type] = unset_bitboard_bit(
                 move.start_square, self.piece_bitboards[mover_type])
-            if defender_type:
-                self.piece_bitboards[defender_type] = unset_bitboard_bit(
-                    move.end_square, self.piece_bitboards[defender_type])
+            # Unset mover_bitboard at end pos
             self.piece_bitboards[mover_type] = set_bitboard_bit(
                 move.end_square, self.piece_bitboards[mover_type])
+
+            # Check for en passant target
+            if ("pawn" in mover_type) and (move.end_square == get_ls1b_index(self.en_passant_target)):
+                if color == 0:
+                    en_passant_defender = move.end_square - 8
+                else:
+                    en_passant_defender = move.end_square + 8
+                defender_type = self.get_piece_on_square(en_passant_defender)
+                # Unset defender_bitboard at end pos
+                self.piece_bitboards[defender_type] = unset_bitboard_bit(
+                        en_passant_defender, self.piece_bitboards[defender_type])
+            else:
+                if defender_type:
+                    self.piece_bitboards[defender_type] = unset_bitboard_bit(
+                        move.end_square, self.piece_bitboards[defender_type])
+
+            # Check for Rook or king movement and update castling rights
+            # 1  2  4  8
+            # wk wq bk bq
+            if "rook" in mover_type and self.castling_rights != 0:
+                if np.bitwise_and(self.castling_rights, np.uint8(2)) and move.start_square == 0:
+                    self.castling_rights = np.bitwise_and(self.castling_rights, np.bitwise_not(np.uint8(2)))
+                elif np.bitwise_and(self.castling_rights, np.uint8(1)) and move.start_square == 7:
+                    self.castling_rights = np.bitwise_and(self.castling_rights, np.bitwise_not(np.uint8(1)))
+                elif np.bitwise_and(self.castling_rights, np.uint8(8)) and move.start_square == 56:
+                    self.castling_rights = np.bitwise_and(self.castling_rights, np.bitwise_not(np.uint8(8)))
+                elif np.bitwise_and(self.castling_rights, np.uint8(4)) and move.start_square == 63:
+                    self.castling_rights = np.bitwise_and(self.castling_rights, np.bitwise_not(np.uint8(4)))
+            if "king" in mover_type and self.castling_rights != 0:
+                if np.bitwise_and(self.castling_rights, np.uint8(3)) and color == 0:
+                    self.castling_rights = np.bitwise_and(self.castling_rights, np.bitwise_not(np.uint8(3)))
+                elif np.bitwise_and(self.castling_rights, np.uint8(12)) and color == 1:
+                    self.castling_rights = np.bitwise_and(self.castling_rights, np.bitwise_not(np.uint8(12)))
+
+            print("CASTLING RIGHTS: ", self.castling_rights)
+
+            # Set or unset en passant target sqaure
+            self.en_passant_target = np.uint64(0)
+            if "pawn" in mover_type:
+                if abs(move.end_square - move.start_square) == 16:
+                    self.en_passant_target = np.uint64(1) << np.uint8((move.start_square + move.end_square) / 2)
+
             return True
         else:
             print("Not a valid move")
