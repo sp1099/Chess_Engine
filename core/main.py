@@ -43,7 +43,7 @@ def main():
                     # check if the selecting human player is allowed to move pieces of the selected color
                     if (current_color == 0 and "white" in piece) or (current_color == 1 and "black" in piece):
                         selected_piece, x_old, y_old = piece, x, y
-                        print("X_old: " + str(x) + " Y_old:" + str(y))
+                        #print("X_old: " + str(x) + " Y_old:" + str(y))
                         # print(str(piece))
                     else:
                         piece = None
@@ -51,16 +51,17 @@ def main():
                     piece = None
             if event.type == pygame.MOUSEBUTTONUP:
                 if piece != None and selected_piece != None:
-                    print("Selected: " + selected_piece)
-                    if piece == "":
-                        print("Move to: " + "empty_field at: x=" +
-                              str(x) + " y=" + str(y))
-                    else:
-                        print("Move to: " + piece + " at: x=" +
-                              str(x) + " y=" + str(y))
+                    # print("Selected: " + selected_piece)
+                    # if piece == "":
+                    #     print("Move to: " + "empty_field at: x=" +
+                    #           str(x) + " y=" + str(y))
+                    # else:
+                    #     print("Move to: " + piece + " at: x=" +
+                    #           str(x) + " y=" + str(y))
                     # check if piece was not moved or empty field was selected
                     if selected_piece == "" or (x == x_old) and (y == y_old):
-                        print("No Move")
+                        #print("No Move")
+                        pass
 
                     # check move for validity in engine
                     # TODO: Send data here to engine and get new bitboards to draw
@@ -72,7 +73,7 @@ def main():
                         turn_finished, game_finished = gui.game.make_move(
                             player_move)
                         if game_finished:
-                            print("FINISHED")
+                            print("GAME FINISHED")
                         # # TODO: ENTFERNEN und durch ENGINE AKTUALISIERUNG ERSETZEN
                         # gui.game.piece_bitboards[selected_piece] = unset_bitboard_bit(
                         #     x_old+8*y_old, gui.game.piece_bitboards[selected_piece])
@@ -80,8 +81,8 @@ def main():
                         # gui.game.piece_bitboards[selected_piece] = set_bitboard_bit(
                         #     x+y*8, gui.game.piece_bitboards[selected_piece])
 
-                        print("Moved")
-                    print("X_new: " + str(x) + " Y_new: " + str(y))
+                        #print("Moved")
+                    #print("X_new: " + str(x) + " Y_new: " + str(y))
                 selected_piece = None
                 x_old = -1
                 y_old = -1

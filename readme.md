@@ -6,12 +6,13 @@
     - [x] En Passant
     - [x] Knight Moves
     - [x] King Moves
-    - [ ] Castling
+    - [x] Castling
     - [x] Bishop Moves
     - [x] Rook Moves
     - [x] Queen Moves
     - [x] Check, if king is in check after a move
     - [ ] Pawn Promotion
+    - [ ] TODO: Bugfix for legal move generation
 - [ ] make_move Function
     - [x] Reset Start Square
     - [x] Reset End Square
