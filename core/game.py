@@ -120,7 +120,7 @@ class Game():
         pseudo_legal_moves.extend(self.generate_bishop_moves())
         pseudo_legal_moves.extend(self.generate_rook_moves())
         pseudo_legal_moves.extend(self.generate_queen_moves())
-        #TODO: castling moves
+        # TODO: castling moves
         pseudo_legal_moves.extend(self.generate_castling_moves())
 
         # Make pseudo legal moves and test for king checks
@@ -460,7 +460,6 @@ class Game():
         else:
             return queen_moves
 
-
     def generate_castling_moves(self):
         castling_moves = []
         # 1  2  4  8
@@ -474,14 +473,16 @@ class Game():
                 if not self.check_square_occupied(5) and not self.check_square_occupied(6):
                     # king(e1) and f1 are not allowd to be under attack
                     if not self.check_square_for_attacked(4, COLOR_BLACK) and not self.check_square_for_attacked(5, COLOR_BLACK):
-                        castling_moves.append(Move(start_square=4, end_square=6,piece_type="castle"))
+                        castling_moves.append(
+                            Move(start_square=4, end_square=6, piece_type="castle"))
             # check queen side castling rights
             if (self.castling_rights >> 1) % 2 == 1:
                 # check that no piece is inbetween king and queen side rook
                 if not self.check_square_occupied(3) and not self.check_square_occupied(2) and not self.check_square_occupied(1):
                     # king(e1) and d1 are not allowd to be under attack
                     if not self.check_square_for_attacked(4, COLOR_BLACK) and not self.check_square_for_attacked(3, COLOR_BLACK):
-                        castling_moves.append(Move(start_square=4, end_square=2,piece_type="castle"))
+                        castling_moves.append(
+                            Move(start_square=4, end_square=2, piece_type="castle"))
         # black side
         else:
             # check king side castling rights
@@ -490,17 +491,18 @@ class Game():
                 if not self.check_square_occupied(61) and not self.check_square_occupied(62):
                     # king(e8) and f8 are not allowd to be under attack
                     if not self.check_square_for_attacked(60, COLOR_WHITE) and not self.check_square_for_attacked(61, COLOR_WHITE):
-                        castling_moves.append(Move(start_square=60, end_square=62,piece_type="castle"))
+                        castling_moves.append(
+                            Move(start_square=60, end_square=62, piece_type="castle"))
             # check queen side castling rights
             if (self.castling_rights >> 3) % 2 == 1:
                 # check that no piece is inbetween king and queen side rook
                 if not self.check_square_occupied(59) and not self.check_square_occupied(58) and not self.check_square_occupied(57):
                     # king(e8) and d8 are not allowd to be under attack
                     if not self.check_square_for_attacked(60, COLOR_WHITE) and not self.check_square_for_attacked(59, COLOR_WHITE):
-                        castling_moves.append(Move(start_square=60, end_square=58,piece_type="castle"))
-        
-        return castling_moves
+                        castling_moves.append(
+                            Move(start_square=60, end_square=58, piece_type="castle"))
 
+        return castling_moves
 
     def check_pseudo_move(self, move):
         # get king position of current color
@@ -513,6 +515,7 @@ class Game():
             current_color_king_field, 1-self.color, use_pseudo_bitboards=True)
 
     def make_move(self, move, use_pseudo_bitboards=False):
+
         current_legal_moves = [move]
         if use_pseudo_bitboards:
             bitboards = self.pseudo_bitboards
@@ -538,10 +541,15 @@ class Game():
             bitboards[mover_type] = unset_bitboard_bit(
                 move.start_square, bitboards[mover_type])
             # Unset mover_bitboard at end pos
-            bitboards[mover_type] = set_bitboard_bit(
-                move.end_square, bitboards[mover_type])
 
-            
+            # handle promotion
+            if move.promotion_piece is not None:
+                bitboards[move.promotion_piece] = set_bitboard_bit(
+                    move.end_square, bitboards[move.promotion_piece])
+            else:
+                bitboards[mover_type] = set_bitboard_bit(
+                    move.end_square, bitboards[mover_type])
+
             # Check for castling move
             if ("king" in mover_type):
                 # white color
@@ -549,25 +557,33 @@ class Game():
                     # king side castling
                     if move.end_square == 6:
                         # Unset and set rook bitboards for castling
-                        bitboards["white_rook"] = unset_bitboard_bit(7, bitboards["white_rook"])
-                        bitboards["white_rook"] = set_bitboard_bit(5, bitboards["white_rook"])
+                        bitboards["white_rook"] = unset_bitboard_bit(
+                            7, bitboards["white_rook"])
+                        bitboards["white_rook"] = set_bitboard_bit(
+                            5, bitboards["white_rook"])
                     # queen side castling
                     elif move.end_square == 2:
                         # Unset and set rook bitboards for castling
-                        bitboards["white_rook"] = unset_bitboard_bit(0, bitboards["white_rook"])
-                        bitboards["white_rook"] = set_bitboard_bit(3, bitboards["white_rook"])
+                        bitboards["white_rook"] = unset_bitboard_bit(
+                            0, bitboards["white_rook"])
+                        bitboards["white_rook"] = set_bitboard_bit(
+                            3, bitboards["white_rook"])
                 # black color
                 else:
                     # king side castling
                     if move.end_square == 62:
                         # Unset and set rook bitboards for castling
-                        bitboards["black_rook"] = unset_bitboard_bit(63, bitboards["black_rook"])
-                        bitboards["black_rook"] = set_bitboard_bit(61, bitboards["black_rook"])
+                        bitboards["black_rook"] = unset_bitboard_bit(
+                            63, bitboards["black_rook"])
+                        bitboards["black_rook"] = set_bitboard_bit(
+                            61, bitboards["black_rook"])
                     # queen side castling
                     elif move.end_square == 58:
                         # Unset and set rook bitboards for castling
-                        bitboards["black_rook"] = unset_bitboard_bit(56, bitboards["black_rook"])
-                        bitboards["black_rook"] = set_bitboard_bit(59, bitboards["black_rook"])
+                        bitboards["black_rook"] = unset_bitboard_bit(
+                            56, bitboards["black_rook"])
+                        bitboards["black_rook"] = set_bitboard_bit(
+                            59, bitboards["black_rook"])
 
             # Check for en passant target
             if ("pawn" in mover_type) and (move.end_square == get_ls1b_index(self.en_passant_target)):
@@ -618,15 +634,17 @@ class Game():
                         self.en_passant_target = np.uint64(1) << np.uint8(
                             (move.start_square + move.end_square) / 2)
 
-            # swap color if method called for actual movement (not pseudo)
+                # swap color if method called for actual movement (not pseudo)
             if not use_pseudo_bitboards:
                 self.color = 1-self.color
                 self.legal_moves = self.generate_moves()
                 # check if checkmate
                 self.game_finished = True if not self.legal_moves else False
+
             return True, self.game_finished
         else:
             print("Not a valid move")
+            # turn_finished, game_finished
             return False, self.game_finished
 
     def get_piece_on_square(self, square):
@@ -692,7 +710,6 @@ class Game():
 
         return False
 
-    
     def check_square_occupied(self, square):
         board_occupancy = np.uint64(0)
         for bitboard in self.piece_bitboards.values():
