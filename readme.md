@@ -11,8 +11,8 @@
     - [x] Rook Moves
     - [x] Queen Moves
     - [x] Check, if king is in check after a move
-    - [ ] Pawn Promotion
-    - [ ] TODO: Bugfix for legal move generation
+    - [x] Pawn Promotion
+    - [x] TODO: Bugfix for legal move generation
 - [ ] make_move Function
     - [x] Reset Start Square
     - [x] Reset End Square
