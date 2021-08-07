@@ -3,7 +3,7 @@ import numpy as np
 from constants import *
 from move import Move
 from utils.bitboard_operations import *
-
+import re
 
 class Game():
 
@@ -739,7 +739,7 @@ class Game():
         return False
 
     def forsyth_to_bitboards(self, forsyth_str: str) -> None:
-        import re
+        
         forsyth_parts = re.findall("([^\s]+)", forsyth_str)
         board_rows = re.findall("([^\/]+)", forsyth_parts[0])
         
@@ -777,19 +777,40 @@ class Game():
             # reverse given row index as the string rows start from top to bottom
             # and numbering of fields in backend start from bottom to top
             row_index = (7 - row_index)*8
-            white_pawn += [m.start()+row_index for m in re.finditer('P', row_string)]
-            white_knight += [m.start() for m in re.finditer('N', row_string)]
-            white_bishop += [m.start() for m in re.finditer('B', row_string)]
-            white_rook += [m.start() for m in re.finditer('R', row_string)]
-            white_queen += [m.start() for m in re.finditer('Q', row_string)]
-            white_king += [m.start() for m in re.finditer('K', row_string)]
 
-            black_pawn += [m.start() for m in re.finditer('p', row_string)]
-            black_knight += [m.start() for m in re.finditer('n', row_string)]
-            black_bishop += [m.start() for m in re.finditer('b', row_string)]
-            black_rook += [m.start() for m in re.finditer('r', row_string)]
-            black_queen += [m.start() for m in re.finditer('q', row_string)]
-            black_king += [m.start() for m in re.finditer('k', row_string)]
+            offset = 0
+            for i, unit in enumerate(row_string):
+                if i != 0 and row_string[i-1].isdigit():
+                    offset += int(row_string[i-1])-1
+                
+                if "p" in unit:
+                    black_pawn.append(row_index + offset)
+                elif "n" in unit:
+                    black_knight.append(row_index + offset)
+                elif "b" in unit:
+                    black_bishop.append(row_index + offset)
+                elif "r" in unit:
+                    black_rook.append(row_index + offset)
+                elif "q" in unit:
+                    black_queen.append(row_index + offset)
+                elif "k" in unit:
+                    black_king.append(row_index + offset)
+
+                elif "P" in unit:
+                    white_pawn.append(row_index + offset)
+                elif "N" in unit:
+                    white_knight.append(row_index + offset)
+                elif "B" in unit:
+                    white_bishop.append(row_index + offset)
+                elif "R" in unit:
+                    white_rook.append(row_index + offset)
+                elif "Q" in unit:
+                    white_queen.append(row_index + offset)
+                elif "K" in unit:
+                    white_king.append(row_index + offset)
+
+
+                offset += 1
         # update bitboards with found positions
         for key, positions in units.items():
             for pos in positions:
