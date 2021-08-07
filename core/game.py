@@ -10,6 +10,10 @@ class Game():
     def __init__(self):
         self.game_finished = False
         self.color = COLOR_WHITE
+        self.turn_counter = 0
+
+
+
         self.en_passant_target = np.uint64(0)
         # 1  2  4  8
         # wk wq bk bq
@@ -719,9 +723,113 @@ class Game():
             return True
         return False
 
+    def forsyth_to_bitboards(self, forsyth_str: str) -> None:
+        import re
+        forsyth_parts = re.findall("([^\s]+)", forsyth_str)
+        board_rows = re.findall("([^\/]+)", forsyth_parts[0])
+        
+        white_pawn = []
+        white_knight = []
+        white_bishop = []
+        white_rook = []
+        white_queen = []
+        white_king = []
+        black_pawn = []
+        black_knight = []
+        black_bishop = []
+        black_rook = []
+        black_queen = []
+        black_king = []
+
+        units = {  
+                "white_pawn": white_pawn, 
+                "white_knight": white_knight, 
+                "white_bishop": white_bishop,
+                "white_rook": white_rook,
+                "white_queen": white_queen,
+                "white_king": white_king,
+                "black_pawn": black_pawn,
+                "black_knight": black_knight,
+                "black_bishop": black_bishop,
+                "black_rook": black_rook,
+                "black_queen": black_queen,
+                "black_king": black_king                
+                }
+
+
+        # find all occurences of respective units and add them to their respective position lists
+        for row_index, row_string in enumerate(board_rows):
+            # reverse given row index as the string rows start from top to bottom
+            # and numbering of fields in backend start from bottom to top
+            row_index = (7 - row_index)*8
+            white_pawn += [m.start()+row_index for m in re.finditer('P', row_string)]
+            white_knight += [m.start() for m in re.finditer('N', row_string)]
+            white_bishop += [m.start() for m in re.finditer('B', row_string)]
+            white_rook += [m.start() for m in re.finditer('R', row_string)]
+            white_queen += [m.start() for m in re.finditer('Q', row_string)]
+            white_king += [m.start() for m in re.finditer('K', row_string)]
+
+            black_pawn += [m.start() for m in re.finditer('p', row_string)]
+            black_knight += [m.start() for m in re.finditer('n', row_string)]
+            black_bishop += [m.start() for m in re.finditer('b', row_string)]
+            black_rook += [m.start() for m in re.finditer('r', row_string)]
+            black_queen += [m.start() for m in re.finditer('q', row_string)]
+            black_king += [m.start() for m in re.finditer('k', row_string)]
+        # update bitboards with found positions
+        for key, positions in units.items():
+            for pos in positions:
+                set_bitboard_bit(pos, self.piece_bitboards[key])
+        
+        # set current color
+        self.color = 0 if "w" in forsyth_parts[1] else 1
+
+        # set castling rights
+        # 1  2  4  8
+        # wk wq bk bq
+        castling_rights = 0
+        castling_rights += 1 if "K" in forsyth_parts[2] else 0
+        castling_rights += 2 if "Q" in forsyth_parts[2] else 0
+        castling_rights += 4 if "k" in forsyth_parts[2] else 0
+        castling_rights += 8 if "q" in forsyth_parts[2] else 0
+        self.castling_rights = np.uint8(castling_rights)
+
+        # set en passant target
+        #test = self.char_number_to_64_board("A8")
+        if "-" not in forsyth_parts[3]:
+            
+            en_passant_target = self.char_number_to_64_board(forsyth_parts[3])
+            self.en_passant_target = en_passant_target if en_passant_target is not None else None
+        else:
+            self.en_passant_target = None
+        
+        
+        # set game_over_turn_counter
+        self.game_over_turn_counter = int(forsyth_parts[4])
+        
+        # set current turn number
+        self.turn_counter = int(forsyth_parts[5])
+        
+        pass
+
+    def bitboards_to_forsyth(self) -> str:
+        forsyth_str = ""
+
+        return forsyth_str
+
+    def char_number_to_64_board(self, char_number:str):
+        row = int(char_number[-1])
+        
+        char = char_number[0]
+        char_int = ord(char) - 65
+        if row < 1 or row > 8 or char_int < 0 or char_int > 7:
+            return None
+        else:
+            return (row-1)*8 + char_int
 
 if __name__ == '__main__':
     board = Game()
+
+    board.forsyth_to_bitboards("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
 
     board.pretty_print_board()
     # for piece_type, bitboard in board.piece_bitboards.items():
